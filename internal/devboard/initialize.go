@@ -1,4 +1,4 @@
-package initialize
+package devboard
 
 import (
 	"errors"
@@ -6,9 +6,6 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
-
-	"github.com/MVN-14/devboard-go/internal/constants"
-	"github.com/MVN-14/devboard-go/internal/io"
 )
 
 func CheckOrCreateApplicationDir() error {
@@ -16,7 +13,7 @@ func CheckOrCreateApplicationDir() error {
 	if err != nil {
 		return err
 	}
-	basePath := filepath.Join(home, "." + constants.ApplicationName)
+	basePath := filepath.Join(home, "." + ApplicationName)
 	
 	_, err = os.Stat(basePath)
 	if err != nil {
@@ -31,7 +28,7 @@ func CheckOrCreateApplicationDir() error {
 		}
 	}
 	
-	dataFilePath := io.GetDataFilePath()
+	dataFilePath := GetDataFilePath()
 	_, err = os.Stat(dataFilePath)
 	if err != nil {
 		if errors.Is(err, fs.ErrNotExist) {

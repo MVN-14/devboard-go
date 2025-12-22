@@ -1,12 +1,10 @@
-package io
+package devboard
 
 import (
 	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
-
-	"github.com/MVN-14/devboard-go/internal/constants"
 )
 
 var homeDirectory string
@@ -26,11 +24,11 @@ func GetHomeDirectory() string {
 }
 
 func GetDataFilePath() string {
-	return filepath.Join(GetHomeDirectory(), constants.ApplicationDirName, constants.DataFileName)
+	return filepath.Join(GetHomeDirectory(), ApplicationDirName, DataFileName)
 }
 
-func GetApplicationData() (ApplicationData, error) {
-	var applicationData ApplicationData
+func GetDevboardData() (DevboardData, error) {
+	var applicationData DevboardData
 	dataFilePath := GetDataFilePath()
 
 	file, err := os.Open(dataFilePath)
@@ -49,4 +47,19 @@ func GetApplicationData() (ApplicationData, error) {
 	return applicationData, nil
 }
 
+func WriteDevboardData(data DevboardData) error {
+	dataFilePath := GetDataFilePath()
 
+	file, err := os.OpenFile(dataFilePath, os.O_WRONLY, os.ModeAppend)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+	
+	err = json.NewEncoder(file).Encode(data)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

@@ -4,39 +4,86 @@ import (
 	"bytes"
 	"database/sql"
 	"fmt"
+	"os"
 	"os/exec"
 
-	"github.com/MVN-14/devboard-go/internal/initialize"
-	"github.com/MVN-14/devboard-go/internal/io"
+	"github.com/MVN-14/devboard-go/internal/devboard"
+	"github.com/docopt/docopt-go"
 	_ "github.com/glebarez/go-sqlite"
 )
 
-type DevboardJSON struct {
-	Projects Project `json:"projects"`
-}
+const usage = `Devboard.
 
-type Project struct {
-	Name string `json:"name"`
-	Path string `json:"path"`
-}
+Usage: devboard (add | update) PROJECT
+       devboard remove PATH
+       devboard list
+       devboard (--help | -h)
+       devboard --version
+
+Arguments:
+    PATH       Path string to the project directory
+    PROJECT    Project json string with the following properties:
+                   name    - project name
+                   path    - path to project directory
+
+Options:
+    -h --help    Show this screen.
+    --version    Show version.
+`
 
 func main() {
-	fmt.Println("Checking application files...")
-	err := initialize.CheckOrCreateApplicationDir()
+	args, err := docopt.ParseArgs(usage, os.Args[1:], "1.0.0")
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("Error parsing usage:", err)
 		return
 	}
-	fmt.Println("Succesfully checked application files.")
 	
-	fmt.Println("Loading application data")
-	data, err := io.GetApplicationData()
-	if err != nil {
-		fmt.Println(err)
-		return
+	devboardArgs := devboard.DevboardArgs{}
+	args.Bind(&devboardArgs)
+	
+	if devboardArgs.Add {
+		err := devboard.AddProject(devboardArgs.Project)
+		if err != nil {
+			panic(err)
+		}
+	} else if devboardArgs.List {
+		projects, err := devboard.ListProjects()
+		if err != nil {
+			panic(err)
+		}
+		
+		fmt.Println(projects)
 	}
 
-	fmt.Printf("data: %+v", data)
+	// for k, v := range args {
+	// 	fmt.Printf("%s = %v\n", k, v)
+	// }
+
+	// if len(os.Args) <= 1 || len(os.Args) > 1 && os.Args[1] == "help" {
+	// 	return
+	// }
+	//
+	// fmt.Println("Checking application files...")
+	// err = devboard.CheckOrCreateApplicationDir()
+	// if err != nil {
+	// 	fmt.Println(err)
+	// 	return
+	// }
+	// fmt.Println("Succesfully checked application files.")
+	//
+	//
+	// switch os.Args[1] {
+	// case "add":
+	// 	if len(os.Args) < 3 {
+	// 		printHelp()
+	// 		break
+	// 	}
+	//
+	// 	err := devboard.AddProject(os.Args[2])
+	// 	if err != nil {
+	// 		panic(err.Error())
+	// 	}
+	// }
 }
 
 func connectDB() {
@@ -55,7 +102,6 @@ func connectDB() {
 	}
 
 	fmt.Printf("Connected to database with sqlite version %s", sqliteVersion)
-
 }
 
 func tmuxLs() {
