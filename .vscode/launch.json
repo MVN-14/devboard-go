@@ -7,7 +7,10 @@
             "request": "launch",
 			"program": "${workspaceFolder}/cmd",
 			"outputMode": "remote",
-			"args": ["add", "{\"name\": \"DevboardTest\" \"path\": \"/home/michael/projects/DevboardTest\"}"]
+			"args": [
+				"add",
+				"{ \"name\": \"Test Project\", \"path\": \"/home/michael/projects/devboard\"}"
+			]
         }
     ]
 }
