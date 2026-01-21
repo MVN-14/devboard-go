@@ -6,7 +6,6 @@ import (
 	"os"
 
 	"github.com/MVN-14/devboard-go/internal/devboard"
-	"github.com/docopt/docopt-go"
 )
 
 func HandleError(msg string) {
@@ -15,22 +14,16 @@ func HandleError(msg string) {
 }
 
 func main() {
-	args, err := docopt.ParseArgs(devboard.Usage, os.Args[1:], "1.0.0")
-	if err != nil {
-		fmt.Println("Error parsing usage:", err)
-		return
-	}
-
-	err = devboard.InitDB()
+	board, err := devboard.NewDevboard(&devboard.SqliteStore{})
 	if err != nil {
 		HandleError(err.Error())
 	}
+	defer board.Close()
 
-	devboardArgs := devboard.DevboardArgs{}
-	args.Bind(&devboardArgs)
+	devboardArgs := devboard.ParseArgs(os.Args[1:])
 
 	if devboardArgs.List {
-		projects, err := devboard.GetProjects()
+		projects, err := board.GetProjects()
 		if err != nil {
 			HandleError(err.Error())
 		}
@@ -39,34 +32,50 @@ func main() {
 			HandleError(err.Error())
 		}
 		fmt.Println(string(bytes))
+
 	} else if devboardArgs.Add {
-		var project devboard.DBProject
+		var project devboard.Project
 		err := json.Unmarshal([]byte(devboardArgs.Project), &project)
 		if err != nil {
 			HandleError(err.Error())
 		}
 
-		err = devboard.AddProject(project)
+		ok, err := board.AddProject(project)
 		if err != nil {
 			HandleError(err.Error())
 		}
-		fmt.Println("Successfully added project", project.Name, "at path", project.Path)
+		if ok {
+			fmt.Println("Successfully added project", project.Name, "at path", project.Path)
+		} else {
+			fmt.Println("Something went wrong")
+		}
+
 	} else if devboardArgs.Remove {
-		err := devboard.DeleteProject(devboardArgs.Path)
+		ok, err := board.DeleteProject(devboardArgs.Id)
 		if err != nil {
 			HandleError(err.Error())
 		}
-		fmt.Println("Deleted project at path", devboardArgs.Path)
+		if ok {
+			fmt.Println("Successfully deleted project with id", devboardArgs.Id)
+		} else {
+			fmt.Println("Something went wrong")
+		}
+
 	} else if devboardArgs.Update {
-		var project devboard.DBProject
+		var project devboard.Project
 		err := json.Unmarshal([]byte(devboardArgs.Project), &project)
 		if err != nil {
 			HandleError(err.Error())
 		}
-			
-		err = devboard.UpdateProject(devboardArgs.Id, project)
+
+		ok, err := board.UpdateProject(project)
 		if err != nil {
 			HandleError(err.Error())
+		}
+		if ok {
+			fmt.Println("Successfully deleted project with id", devboardArgs.Id)
+		} else {
+			fmt.Println("Something went wrong")
 		}
 	}
 }
