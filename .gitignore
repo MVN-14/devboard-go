@@ -1,2 +1,8 @@
 
 *.db
+
+.vscode/
+
+build.sh
+
+devboard
