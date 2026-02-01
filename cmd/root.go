@@ -6,15 +6,15 @@ import (
 	"os"
 	"path"
 
-	"database/sql"
-
+	"github.com/MVN-14/devboard-go/devboard"
 	_ "github.com/glebarez/go-sqlite"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
-var db *sql.DB
 var cfgFile string
+
+var board *devboard.Board
 
 var rootCmd = &cobra.Command{
 	Use:   "devboard",
@@ -22,9 +22,35 @@ var rootCmd = &cobra.Command{
 	Long: `
 Command Line Interface to interact with devboard. 
 Can add, remove, update, and list projects tracked by devboard`,
-	Version:           "1.0.0",
-	PersistentPreRunE: setUpDevboard,
-	PersistentPostRun: closeDb,
+	Version: "1.0.0",
+	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+		err := initConfig(cmd)
+		if err != nil {
+			return err
+		}
+		
+		dbPath := viper.GetString("dbpath")
+		if dbPath == "" {
+			home, err := os.UserHomeDir()
+			if err != nil {
+				return err
+			}
+			dbPath = path.Join(home, ".devboard", "devboard.db")
+		}
+
+		board, err = devboard.New(viper.GetString("dbpath"))
+		if err != nil {
+			return err
+		}
+
+		if viper.GetBool("verbose") {
+			fmt.Println("Connected to db at", dbPath)
+		}
+		return nil
+	},
+	PersistentPostRun: func(cmd *cobra.Command, args []string) {
+		board.Close()
+	},
 }
 
 func Execute() {
@@ -32,49 +58,6 @@ func Execute() {
 	if err != nil {
 		os.Exit(1)
 	}
-}
-
-func setUpDevboard(cmd *cobra.Command, args []string) error {
-	err := initConfig(cmd)
-	if err != nil {
-		return err
-	}
-
-	err = initDb()
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func initDb() error {
-	var err error
-	dbPath := viper.GetString("dbpath")
-	if dbPath == "" {
-		home, err := os.UserHomeDir()
-		if err != nil {
-			return err
-		}
-		dbPath = path.Join(home, ".devboard", "devboard.db")
-	}
-	db, err = sql.Open("sqlite", dbPath)
-	if err != nil {
-		return err
-	}
-	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS projects (
-		command 	TEXT,
-		id 			INTEGER PRIMARY KEY,
-		name 		TEXT NOT NULL,
-		path 		TEXT NOT NULL,
-		created_at	DATETIME NOT NULL DEFAULT (datetime('now', 'localtime')),
-		updated_at	DATETIME NOT NULL DEFAULT (datetime('now', 'localtime')),
-		deleted_at	DATETIME 
-	);`)
-
-	if err != nil {
-		return err
-	}
-	return nil
 }
 
 func initConfig(cmd *cobra.Command) error {
@@ -100,22 +83,17 @@ func initConfig(cmd *cobra.Command) error {
 		}
 	}
 
-
 	err := viper.BindPFlags(cmd.Flags())
 	if err != nil {
 		return err
 	}
-	
+
 	if viper.GetBool("verbose") {
 		fmt.Println("Read config from", viper.ConfigFileUsed())
 		fmt.Println("Config is:", viper.AllSettings())
 	}
 
 	return nil
-}
-
-func closeDb(*cobra.Command, []string) {
-	db.Close()
 }
 
 func init() {

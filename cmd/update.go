@@ -2,9 +2,11 @@ package cmd
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/MVN-14/devboard-go/devboard"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 var updateCmd = &cobra.Command{
@@ -27,21 +29,15 @@ Project argument must be a json string in the following format:
 func updateProject(cmd *cobra.Command, args []string) error {
 	p := devboard.Project{}
 	json.Unmarshal([]byte(args[0]), &p)
-
-	_, err := db.Exec(`
-		UPDATE projects 
-		SET 
-			name = ?,
-			path = ?,
-			command = ?,
-			updated_at = (datetime('now', 'localtime'))
-		WHERE 
-			id = ?;`, p.Name, p.Path, p.Command, p.Id)
-
+	
+	err := board.Update(p)
 	if err != nil {
 		return err
 	}
 
+	if viper.GetBool("verbose") {
+		fmt.Printf("Successfully updated project %s\n", p.Name)
+	}
 	return nil
 }
 

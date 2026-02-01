@@ -2,8 +2,10 @@ package cmd
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 var deleteCmd = &cobra.Command{
@@ -15,14 +17,19 @@ var deleteCmd = &cobra.Command{
 }
 
 func deleteProject(cmd *cobra.Command, args []string) error {
-	res, err := db.Exec(`
-		UPDATE projects SET deleted_at = (datetime('now', 'localtime')) WHERE id = ?;
-	`, args[0])	
+	id, err := strconv.Atoi(args[0])
 	if err != nil {
 		return err
 	}
-	rows, _ := res.RowsAffected()
-	fmt.Printf("Successfully deleted %d rows", rows)
+
+	err = board.Delete(id)
+	if err != nil {
+		return err
+	}
+
+	if viper.GetBool("verbose") {
+		fmt.Printf("Successfully deleted project with id %s", args[0])
+	}
 
 	return nil
 }

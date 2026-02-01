@@ -6,6 +6,7 @@ import (
 
 	"github.com/MVN-14/devboard-go/devboard"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 var addCmd = &cobra.Command{
@@ -27,15 +28,13 @@ func addProject(cmd *cobra.Command, args []string) error {
 	p := devboard.Project{}
 	json.Unmarshal([]byte(args[0]), &p)
 
-	_, err := db.Exec(
-		`INSERT INTO projects (name, path, command) VALUES (?, ?, ?)`,
-		p.Name, p.Path, p.Command)
-
+	err := board.Add(p)
 	if err != nil {
 		return err
 	}
-	
-	fmt.Printf("Project %s added successfully", p.Name)
+	if viper.GetBool("verbose") {
+		fmt.Printf("Project %s added successfully", p.Name)
+	}
 	return nil
 }
 
