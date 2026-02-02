@@ -38,7 +38,7 @@ Can add, remove, update, and list projects tracked by devboard`,
 			dbPath = path.Join(home, ".devboard", "devboard.db")
 		}
 
-		board, err = devboard.New(viper.GetString("dbpath"))
+		board, err = devboard.New(dbPath)
 		if err != nil {
 			return err
 		}
