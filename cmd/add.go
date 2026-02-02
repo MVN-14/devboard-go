@@ -1,0 +1,43 @@
+package cmd
+
+import (
+	"encoding/json"
+	"fmt"
+
+	"github.com/MVN-14/devboard-go/devboard"
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+)
+
+var addCmd = &cobra.Command{
+	Use:   "add PROJECT",
+	Short: "Add a project to devboard",
+	Long: `Add a project to be tracked by devboard
+
+Project argument must be a json string in the following format:
+{
+    name: "My Project",                   - name of your project
+    path: "/home/joe/projectDir",         - the path to your project directory
+    command: "vim /home/joe/projectDir",  - (optional) startup command for project
+}`,
+	RunE: addProject,
+	Args: cobra.MatchAll(cobra.ExactArgs(1), isValidAddProjectArg),
+}
+
+func addProject(cmd *cobra.Command, args []string) error {
+	p := devboard.Project{}
+	json.Unmarshal([]byte(args[0]), &p)
+
+	err := board.Add(p)
+	if err != nil {
+		return err
+	}
+	if viper.GetBool("verbose") {
+		fmt.Printf("Project %s added successfully", p.Name)
+	}
+	return nil
+}
+
+func init() {
+	rootCmd.AddCommand(addCmd)
+}
