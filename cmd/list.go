@@ -26,5 +26,5 @@ var listCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(listCmd)
-	listCmd.Flags().Bool("deleted", false, "List deleted projects")
+	listCmd.Flags().BoolP("deleted", "d", false, "List deleted projects")
 }
