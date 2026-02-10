@@ -20,8 +20,8 @@ var rootCmd = &cobra.Command{
 	Use:   "devboard",
 	Short: "CLI for devboard",
 	Long: `
-Command Line Interface to interact with devboard. 
-Can add, remove, update, and list projects tracked by devboard`,
+Command line interface to interact with dev projects. 
+Can open, add, remove, update, and list projects tracked by devboard`,
 	Version: "1.0.0",
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 		err := initConfig(cmd)
@@ -97,7 +97,7 @@ func initConfig(cmd *cobra.Command) error {
 }
 
 func init() {
-	rootCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", "", "config file (default is $HOME/.devboard/devboard.yaml)")
-	rootCmd.PersistentFlags().String("dbpath", "", "Path to sqlite database")
-	rootCmd.PersistentFlags().BoolP("verbose", "v", false, "Path to sqlite database")
+	rootCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", "", "config file priority: flag value (.yaml file), config.yaml in project directory, $HOME/.devboard/devboard.yaml")
+	rootCmd.PersistentFlags().String("dbpath", "", "path to sqlite database (default - $HOME/.devboard/devboard.db)")
+	rootCmd.PersistentFlags().BoolP("verbose", "v", false, "verbose output")
 }
