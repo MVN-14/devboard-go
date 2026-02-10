@@ -16,9 +16,9 @@ var addCmd = &cobra.Command{
 
 Project argument must be a json string in the following format:
 {
-    name: "My Project",                   - name of your project
-    path: "/home/joe/projectDir",         - the path to your project directory
-    command: "vim /home/joe/projectDir",  - (optional) startup command for project
+    name: "My Project",                     - name of your project
+    path: "/home/joe/projectDir",           - the path to your project directory
+    command: "alacritty -e nvim $projPath"  - (optional) startup command for project
 }`,
 	RunE: addProject,
 	Args: cobra.MatchAll(cobra.ExactArgs(1), isValidAddProjectArg),
