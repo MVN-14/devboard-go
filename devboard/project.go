@@ -28,7 +28,7 @@ func (p *Project) FromRow(r *sql.Row) error {
 type ProjectList []Project
 
 func (pl ProjectList) String() string {
-	b, _ := json.Marshal(pl)
+	b, _ := json.MarshalIndent(pl, "", "  ")
 	return string(b)
 }
 
