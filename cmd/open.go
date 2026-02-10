@@ -17,7 +17,7 @@ var openCmd = &cobra.Command{
 	1. --command flag passed to program at runtime
 	2. "command" field on the project
 	3. DEVBOARD_CMD env var
-	4. cmd config value
+	4. "cmd" value in config
 
 	if none are present it will throw an error
 	
