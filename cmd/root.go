@@ -73,7 +73,7 @@ func initConfig(cmd *cobra.Command) error {
 		viper.AddConfigPath(".")
 		viper.AddConfigPath(path.Join(home, ".devboard"))
 		viper.SetConfigName("config")
-		viper.SetConfigType("yaml")
+		viper.SetConfigType("json")
 	}
 
 	if err := viper.ReadInConfig(); err != nil {
@@ -97,7 +97,7 @@ func initConfig(cmd *cobra.Command) error {
 }
 
 func init() {
-	rootCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", "", "config file priority: flag value (.yaml file), config.yaml in project directory, $HOME/.devboard/devboard.yaml")
+	rootCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", "", "config file priority: flag value (.json file), config.json in project directory, $HOME/.devboard/devboard.json")
 	rootCmd.PersistentFlags().String("dbpath", "", "path to sqlite database (default - $HOME/.devboard/devboard.db)")
 	rootCmd.PersistentFlags().BoolP("verbose", "v", false, "verbose output")
 }
