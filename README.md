@@ -5,13 +5,17 @@ Track dev projects from the terminal with ease with this _customizable_ dev-dash
 
 
 ## Demo
+![demo](https://vhs.charm.sh/vhs-5xd22qvwJz5fyC0hNWTvgO.gif)
 This is a rawdog example of interacting with the cli, although it was really written to allow for easy ui implementations or scripted automation.
 
-![demo](https://vhs.charm.sh/vhs-5xd22qvwJz5fyC0hNWTvgO.gif)
+**For more practical usage, check out <a href="https://github.com/MVN-14/devboard-tui" target="_blank">Devboard-TUI</a>,
+a terminal UI wrapper for devboard powered by <a target="_blank" href="https://github.com/charmbracelet">charm tools</a>**
+
 
 ## Installation
 
-``` bash
+### With Go
+```
 git clone https://github.com/MVN-14/devboard-go
 cd devboard-go
 go install devboard.go
