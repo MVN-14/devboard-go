@@ -23,13 +23,13 @@ Devboard allows for different flags to customize program behaviour.<br>
 Devboard evaluates variables in the following order and stops when one exists:<br>
 1. **Command line flag. - eg. (--dbpath=test.db)**
 2. **Environment variable. - eg. (DEVBOARD_DBPATH=test.db)**
-3. **Config value. - eg. (`dbpath: test.db` in config.yaml)**
+3. **Config value. - eg. (`dbpath: test.db` in config.json)**
 
 |Cmd|Flag(s), Variable|Default|Decription|
 |---|--------------|-------|----------|
 |**all**|`--verbose,-v, DEVBOARD_VERBOSE`|false|Verbose output|
 |**all**|`--dbpath, DEVBOARD_DBPATH`|$HOME/.devboard/devboard.db|Path to **_existing directory_** to open or create db|
-|**all**|`-c,--config DEVBOARD_CONFIG`|$HOME/.devboard/config.yaml|Config file location (default is $HOME/.devboard/config.yaml)<br>**Config file must be yaml format** [See config](#config)
+|**all**|`-c,--config DEVBOARD_CONFIG`|$HOME/.devboard/config.json|Config file location (default is $HOME/.devboard/config.json)<br>**Config file must be json format** [See config](#config)
 |**list**|`-d,--deleted DEVBOARD_DELETED`|false|Show deleted projects in list|
 |**open**|`--command DEVBOARD_COMMAND`| `echo "no command present in project, environment, or config"`|Command to execute to open project if command field is not set for specified project|
 
