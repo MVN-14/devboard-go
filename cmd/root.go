@@ -28,13 +28,33 @@ Can open, add, remove, update, and list projects tracked by devboard`,
 		if err != nil {
 			return err
 		}
+
+		home, err := os.UserHomeDir()
+		if err != nil {
+			return err
+		}
+
+		dir := path.Join(home, ".devboard")
 		
-		dbPath := viper.GetString("dbpath")
-		if dbPath == "" {
-			home, err := os.UserHomeDir()
-			if err != nil {
+		info, err := os.Stat(dir)
+		if err != nil {
+			if os.IsNotExist(err) {
+				if viper.GetBool("verbose") {
+					fmt.Printf("Creating devboard directory at '%s'\n", dir)
+				}
+				err = os.Mkdir(dir, 0755)
+				if err != nil {
+					return err
+				}
+			} else {
 				return err
 			}
+		} else if !info.IsDir() {
+			return fmt.Errorf("%s is not a directory.\n", dir)
+		}
+
+		dbPath := viper.GetString("dbpath")
+		if dbPath == "" {
 			dbPath = path.Join(home, ".devboard", "devboard.db")
 		}
 
